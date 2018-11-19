@@ -1,0 +1,44 @@
+{% set name = "HighFive" %}
+{% set version = "2.0.0" %}
+{% set sha256 = "deee33d7f578e33dccb5d04771f4e01b89a980dd9a3ff449dd79156901ee8d25" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  fn: HighFive-v2.0.tar.gz
+  url: https://github.com/BlueBrain/HighFive/archive/v2.0.tar.gz
+  sha256: {{ sha256 }}
+
+build:
+  number: 0
+  skip: True  # [win and vc<14]
+
+requirements:
+  host:
+    - {{ compiler('cxx') }}
+    - cmake
+    - hdf5
+    - boost
+    - boost-cpp
+  run:
+    - hdf5
+
+test:
+  commands:
+
+about:
+  home: https://github.com/BlueBrain/HighFive
+  license: BSL 1
+  license_family: BSD
+  license_file: LICENSE
+  summary: 'Header-only C++ HDF5 interface'
+  description: 'HighFive is a modern C++/C++11 friendly interface for libhdf5.'
+  dev_url: https://github.com/BlueBrain/HighFive
+
+extra:
+  recipe-maintainers:
+    - wolfv
+    - SylvainCorlay
+    - JohanMabille
