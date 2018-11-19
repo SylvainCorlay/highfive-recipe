@@ -1,0 +1,39 @@
+language: generic
+os: osx
+osx_image: xcode6.4
+env:
+  global:
+  - secure: WKGiyHWqoxH0WA93W7XcG4HLCrTVZFUgw5E+ihwDQ/jWUi8KhmimF2iFT6Znvr+R1hvRiK8i1C3+zPHl7AqDYjb/FvhTCsUnZVoBXIjU2UA+c4zpi7keGPi6jweAn0vgeCZ9aEK/kZDyIuLBmI7KLmBqNwBa+VD28IezsYy624phDIeARrtqrHsWdvBPeb0S19aMH7sEeA96emk2TAly3taUSpBDQHZuUtCGBfX9Nq8n8LgGgw/G0qI3MAnMaYW8IxRFCuyfjaF8HjITX8UdKtiv4sJIZeTfMjO0dFFu15UyMSvA1ZFMhr3nvAXoxiAVW8SCupcXJV10hpoyrtaXbmtkjKO48bGlBhAZlegVbSlVKm5SWPj6VUzeiDWjy1c41J0iRUjd33b+UiiYRPaN/bxzep/bDCYXmmn130QmdkXmghzRL9YWN8vWasYip84GwKe/+qvIE/vOG4+yXDcS7a/ZSXIDaRGmM5X46cwWxMvdun0QSuneaMoe7JOOD++PuZ8YgGf1wHliRsTkr08eHtdY6hEXSRoFH9ZJmNa0FM9SGUTiRKUuKPCB+ykvWHpxpeHKq8czU2PfZqh4FKthcq4sy/DeT8+6I3VLqg8ETLhLdJ8nbgaZMSqt7v8mK40XiNWVdwcY9iRnqAjp3HVbDts6oC3C7KYGfk+gIUGeu0w=
+before_install:
+- |
+  (curl https://raw.githubusercontent.com/conda-forge/conda-forge-build-setup-feedstock/master/recipe/ff_ci_pr_build.py | \
+      python - -v --ci "travis" "${TRAVIS_REPO_SLUG}" "${TRAVIS_BUILD_NUMBER}" "${TRAVIS_PULL_REQUEST}") || exit 1
+- |
+  echo ""
+  echo "Removing homebrew from Travis CI to avoid conflicts."
+  curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/uninstall > ~/uninstall_homebrew
+  chmod +x ~/uninstall_homebrew
+  ~/uninstall_homebrew -fq
+  rm ~/uninstall_homebrew
+install:
+- |
+  echo ""
+  echo "Installing a fresh version of Miniconda."
+  MINICONDA_URL="https://repo.continuum.io/miniconda"
+  MINICONDA_FILE="Miniconda3-latest-MacOSX-x86_64.sh"
+  curl -L -O "${MINICONDA_URL}/${MINICONDA_FILE}"
+  bash $MINICONDA_FILE -b
+- |
+  echo ""
+  echo "Configuring conda."
+  source /Users/travis/miniconda3/bin/activate root
+  conda config --remove channels defaults
+  conda config --add channels defaults
+  conda config --add channels conda-forge
+  conda config --add channels QuantStack
+  conda config --set show_channel_urls true
+  conda install --yes --quiet conda-forge-build-setup
+  source run_conda_forge_build_setup
+script:
+- conda build ./recipe
+- upload_or_check_non_existence ./recipe QuantStack --channel=main
