@@ -16,8 +16,9 @@ build:
   skip: True  # [win and vc<14]
 
 requirements:
-  host:
-    - {{ compiler('cxx') }}
+  build:
+    - toolchain
+    - gcc-7  # [linux]
     - cmake
     - hdf5
     - boost
@@ -30,8 +31,7 @@ test:
 
 about:
   home: https://github.com/BlueBrain/HighFive
-  license: BSL 1
-  license_family: BSD
+  license: BSL-1.0
   license_file: LICENSE
   summary: 'Header-only C++ HDF5 interface'
   description: 'HighFive is a modern C++/C++11 friendly interface for libhdf5.'
